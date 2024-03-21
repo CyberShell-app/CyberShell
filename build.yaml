@@ -34,7 +34,7 @@ NestedModule:
 #    OutputDirectory: ///Modules/HelperSubmodule
 #    VersionedOutputDirectory: false
 #    AddToManifest: false
-#    SemVer: 
+#    SemVer:
 #    # suffix:
 #    # prefix:
 
@@ -77,7 +77,6 @@ BuildWorkflow:
 
   publish:
     - publish_module_to_gallery
-
     - Publish_Release_To_GitHub
 
 
