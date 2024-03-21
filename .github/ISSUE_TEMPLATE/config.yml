@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "CyberSocForce GitHub discussion channel"
+    url: https://dsccommunity.org/community/contact/
+    about: "For any quesitons of to share your thought about this powershell module, please visit the GitHub discussion channel."
