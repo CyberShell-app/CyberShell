@@ -54,14 +54,14 @@ class ResourceLogCategory {
 
     # Convenience constructor from hashtable
     ResourceType([hashtable]$Properties) {
-        [ResourceType]::Validate($Properties.ContainerId, $Properties.ResourceTypeName, $Properties.SourceType)
+        [ResourceLogCategory]::Validate($Properties.ContainerId, $Properties.ResourceTypeName, $Properties.SourceType)
         $this.Init($Properties)
         $this.GetDiagnosticSettings()
     }
 
     # Common constructor for core properties
     ResourceType([string]$ContainerId, [string]$ResourceTypeName, [string]$SourceType) {
-        [ResourceType]::Validate($ContainerId, $ResourceTypeName, $SourceType)
+        [ResourceLogCategory]::Validate($ContainerId, $ResourceTypeName, $SourceType)
         $this.ContainerId = $ContainerId
         $this.ResourceTypeName = $ResourceTypeName
         $this.SourceType = $SourceType
