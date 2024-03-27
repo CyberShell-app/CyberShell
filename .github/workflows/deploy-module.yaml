@@ -59,7 +59,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
@@ -82,7 +82,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
@@ -105,7 +105,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
@@ -133,21 +133,21 @@ jobs:
       #   with:
       #     fetch-depth: 0
       # - name: Download Test Artifacts
-      #   uses: actions/download-artifact@v3
+      #   uses: actions/download-artifact@v4
       #   with:
       #     path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
       - name: Download Test Artifact macOS
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CodeCoverageMacOS
           path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageMacOS/
       - name: Download Test Artifact Linux
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CodeCoverageLinux
           path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageLinux/
       - name: Download Test Artifact Windows (PS7)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CodeCoverageWinPS7
           path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS7/
@@ -193,7 +193,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
