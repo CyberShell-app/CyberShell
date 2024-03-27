@@ -8,7 +8,7 @@ CyberShell is a user-friendly command-line tool designed to:
 - Assist in improving the cloud security posture
 
 ## 1. Feature Highlights and Benefits
-*to be completed soon*
+*to be completed soon*.
 
 ## 2. Target Audience
 - **Soc Manager:** The Soc Manager can use the CyberShell tool to oversee and manage security configurations in complex environments, consolidate security insights, and ensure compliance with cybersecurity standards.
