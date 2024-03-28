@@ -9,7 +9,7 @@ $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
 ).BaseName
 
 # Import the project module
-Import-Module $ProjectName
+Import-Module $ProjectName -Force
 
 # Define tests within the scope of the project module
 InModuleScope $ProjectName {
@@ -36,10 +36,6 @@ InModuleScope $ProjectName {
             SourceType  = "Az"
             ContainerId = "00000000-0000-0000-0000-000000000000"
         }
-
-        Mock -CommandName "Get-AzContext" -MockWith {
-            return @{ Subscription = "00000000-0000-0000-0000-000000000000" }
-        } -Verifiable
 
         # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
         Mock -CommandName 'Get-AzDiagnosticSettingCategory' -MockWith {
