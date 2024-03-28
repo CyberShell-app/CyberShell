@@ -7,10 +7,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add 'ResourceLogCategory' Class
-
-## [v0.1.0]
-
-### Added
-
 - Powershell module initialization using the excellent [Sampler](https://github.com/gaelcolas/Sampler).
+- Add 'ResourceLogCategory' Class
