@@ -54,6 +54,21 @@ InModuleScope $ProjectName {
                     return @()
                 }
             }
+
+            # Mock the Get-AzResource function to return predefined results for testing
+            Mock Get-AzResource {
+                param($ResourceType)
+
+                if ($ResourceType -eq "Provider.Resource1/Type") {
+                    return @{ ResourceId = "11111111-1111-1111-1111-111111111111" }
+                }
+                elseif ($ResourceType -eq "Provider.Resource2/Type") {
+                    return @{ ResourceId = "22222222-2222-2222-2222-222222222222" }
+                }
+                else {
+                    return @{ ResourceId = "00000000-0000-0000-0000-000000000000" }
+                }
+            }
         }
 
         # Describe the group of tests for property initialization
