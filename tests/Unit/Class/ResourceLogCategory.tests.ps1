@@ -53,7 +53,7 @@ InModuleScope $ProjectName {
                 else {
                     return @()
                 }
-            } -Verifiable -ModuleName 'CyberShell'
+            } -Verifiable
 
             # Mock the Get-AzResource function to return predefined results for testing
             Mock -CommandName 'Get-AzResource' -MockWith {
