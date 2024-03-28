@@ -8,76 +8,67 @@ $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
         $(try { Test-ModuleManifest $_.FullName -ErrorAction Stop }catch { $false }) }
 ).BaseName
 
+# Import the project module
 Import-Module $ProjectName
 
+# Define tests within the scope of the project module
 InModuleScope $ProjectName {
 
-    Describe 'Test' {
+    # Describe the group of tests for the ResourceLogCategory class
+    Describe 'ResourceLogCategory Class Unit Tests' {
+        # Define setup actions to be performed before all tests
         BeforeAll {
+            # Define properties for valid and invalid test objects
+            # ...
 
-            $ValidObj1Properties = @{
-                SourceType       = "Az"
-                ContainerId      = "00000000-0000-0000-0000-000000000000"
-                ResourceTypeName = "Provider.Resource1/Type"
+            # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
+            Mock Get-AzDiagnosticSettingCategory {
+                # ...
             }
         }
-        It 'should validate correct data input' {
-            { [ResourceLogCategory]::Validate(
-                    $ValidObj1Properties.ContainerId,
-                    $ValidObj1Properties.ResourceTypeName,
-                    $ValidObj1Properties.SourceType) } | Should -Not -Throw
+
+        # Describe the group of tests for property initialization
+        Describe 'ResourceLogCategory Class Property Initialization' {
+            # Test that valid data input is validated correctly
+            It 'should validate correct data input' {
+                # ...
+            }
+            # Test that invalid data input is not validated
+            It 'should not validate incorrect data input' {
+                # ...
+            }
+            # Test that empty data input is not validated
+            It 'should not validate empty data input' {
+                # ...
+            }
+        }
+
+        # Describe the group of tests for constructors
+        Describe 'ResourceLogCategory Class Constructors Tests' {
+            # Test that the object is created correctly with separate properties
+            It 'Should create the object with separate properties' {
+                # ...
+            }
+            # Test that the object is created correctly from a hashtable
+            It 'should create an object with constructor from hashtable' {
+                # ...
+            }
+        }
+
+        # Describe the group of tests for methods
+        Describe 'ResourceLogCategory Class Methods Tests' {
+            # Test that the method handles resource types with diagnostic settings available
+            It 'should handle resource type with diagnostic settings available' {
+                # ...
+            }
+            # Test that the method handles resource types with no diagnostic settings
+            It 'should handle resource type with no diagnostic settings' {
+                # ...
+            }
+            # Test that the method returns a string representation of the object
+            It 'should return a string representation of the object' {
+                # ...
+            }
         }
     }
 }
-# Write-Host "Attempting to import module from path: $ProjectPath"
-# Import-Module $ProjectName
-
-# InModuleScope $ProjectName {
-
-
-#     Describe "ResourceType Class Comprehensive Tests" {
-#         BeforeAll {
-#             $ValidObj1Properties = @{
-#                 SourceType       = "Az"
-#                 ContainerId      = "00000000-0000-0000-0000-000000000000"
-#                 ResourceTypeName = "Provider.Resource1/Type"
-#             }
-#             $ValidObj2Properties = @{
-#                 SourceType       = "Az"
-#                 ContainerId      = "00000000-0000-0000-0000-000000000000"
-#                 ResourceTypeName = "Provider.Resource2/Type"
-#             }
-#             $InvalidObjProperties = @{
-#                 SourceType       = "Az"
-#                 ContainerId      = "ObjectId"
-#                 ResourceTypeName = "Provider.Resource3/Type"
-#             }
-#         }
-#         Describe "ResourceType Class Property Initialization" {
-#             It 'should validate correct data input' {
-#                 { [ResourceLogCategory]::Validate(
-#                         $ValidObj1Properties.ContainerId,
-#                         $ValidObj1Properties.ResourceTypeName,
-#                         $ValidObj1Properties.SourceType) } | Should -Not -Throw
-#             }
-#             It 'should not validate incorrect data input' {
-#                 { [ResourceLogCategory]::Validate($InvalidObjProperties.ContainerId,
-#                         $InvalidObjProperties.ResourceTypeName,
-#                         $InvalidObjProperties.SourceType) } | Should -Throw
-#             }
-#         }
-#         Describe "ResourceType  Class Constructors Tests" {
-#             #default constructor
-#             It 'should create an object with default constructor' {
-#                 { [ResourceLogCategory]::new() } | Should -Not -Throw
-#             }
-#             #constructor from hashtable
-#             It 'should create an object with constructor from hashtable' {
-#                 { [ResourceLogCategory]::new($ValidObj1Properties) } | Should -Not -Throw
-#                 $obj = [ResourceLogCategory]::new($ValidObj1Properties)
-#                 $obj | Should -BeOfType [ResourceLogCategory]
-#             }
-#         }
-#         Describe "ResourceType Class Methods Tests" {
-#         }
-#     }

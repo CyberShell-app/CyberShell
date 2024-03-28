@@ -45,7 +45,7 @@ class ResourceLogCategory {
     # ------------------------------
 
     # Default constructor
-    ResourceType() {
+    ResourceLogCategory() {
         # There's no need to reinitialize LogCategory and MetricCategory in this constructor
         # as they are already initialized when the class properties are declared.
         # Typically, a constructor is used for any logic that needs to be executed during object creation.
@@ -53,14 +53,14 @@ class ResourceLogCategory {
     }
 
     # Convenience constructor from hashtable
-    ResourceType([hashtable]$Properties) {
+    ResourceLogCategory([hashtable]$Properties) {
         [ResourceLogCategory]::Validate($Properties.ContainerId, $Properties.ResourceTypeName, $Properties.SourceType)
         $this.Init($Properties)
         $this.GetDiagnosticSettings()
     }
 
-    # Common constructor for core properties
-    ResourceType([string]$ContainerId, [string]$ResourceTypeName, [string]$SourceType) {
+    # Common constructor for separate properties
+    ResourceLogCategory([string]$ContainerId, [string]$ResourceTypeName, [string]$SourceType) {
         [ResourceLogCategory]::Validate($ContainerId, $ResourceTypeName, $SourceType)
         $this.ContainerId = $ContainerId
         $this.ResourceTypeName = $ResourceTypeName
