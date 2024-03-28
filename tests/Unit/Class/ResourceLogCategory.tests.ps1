@@ -37,6 +37,10 @@ InModuleScope $ProjectName {
             ContainerId = "00000000-0000-0000-0000-000000000000"
         }
 
+        Mock -CommandName "Get-AzContext" -MockWith {
+            return @{ Subscription = "00000000-0000-0000-0000-000000000000" }
+        } -Verifiable
+
         # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
         Mock -CommandName 'Get-AzDiagnosticSettingCategory' -MockWith {
             param($ResourceId)
