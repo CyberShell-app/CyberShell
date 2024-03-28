@@ -68,7 +68,7 @@ InModuleScope $ProjectName {
                 else {
                     return @{ ResourceType = "Provider.Resource3/Type" }
                 }
-            } -Verifiable -ModuleName 'CyberShell'
+            } -Verifiable
         }
 
         # Describe the group of tests for property initialization
