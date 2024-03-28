@@ -1,0 +1,45 @@
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
+
+$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
+$ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
+        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
+        $(try { Test-ModuleManifest $_.FullName -ErrorAction Stop }catch { $false }) }
+).BaseName
+
+# Import the project module
+Import-Module $ProjectName
+
+# Define tests within the scope of the project module
+InModuleScope $ProjectName {
+
+    # Describe the group of tests for the class
+    Describe '<ClassName> Class Unit Tests' {
+        # Define setup actions to be performed before all tests
+        BeforeAll {
+            # Define properties for valid and invalid test objects
+            # ...
+
+            # Mock the function to return predefined results for testing
+            Mock <FunctionName> {
+                # ...
+            }
+        }
+
+        # Describe the group of tests for property initialization
+        Describe '<ClassName> Class Property Initialization' {
+            # Placeholder for tests
+        }
+
+        # Describe the group of tests for constructors
+        Describe '<ClassName> Class Constructors Tests' {
+            # Placeholder for tests
+        }
+
+        # Describe the group of tests for methods
+        Describe '<ClassName> Class Methods Tests' {
+            # Placeholder for tests
+        }
+    }
+}
