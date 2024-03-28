@@ -41,7 +41,7 @@ InModuleScope $ProjectName {
             }
 
             # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
-            Mock Get-AzDiagnosticSettingCategory {
+            Mock -CommandName 'Get-AzDiagnosticSettingCategory' -MockWith {
                 param($ResourceId)
 
                 if ($ResourceId -eq "11111111-1111-1111-1111-111111111111") {
