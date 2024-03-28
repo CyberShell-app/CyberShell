@@ -39,8 +39,6 @@ InModuleScope $ProjectName {
 
         # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
         Mock -CommandName 'Get-AzDiagnosticSettingCategory' -MockWith {
-            param($ResourceId)
-
             if ($ResourceId -eq "11111111-1111-1111-1111-111111111111") {
                 return @(
                     @{ Name = "LogCategory1"; CategoryType = "Logs" },
@@ -54,8 +52,6 @@ InModuleScope $ProjectName {
 
         # Mock the Get-AzResource function to return predefined results for testing
         Mock -CommandName 'Get-AzResource' -MockWith {
-            param($ResourceId)
-
             if ($ResourceId -eq "11111111-1111-1111-1111-111111111111") {
                 return @{ ResourceType = "Provider.Resource1/Type" }
             }
