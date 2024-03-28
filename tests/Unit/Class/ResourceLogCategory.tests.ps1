@@ -53,7 +53,7 @@ InModuleScope $ProjectName {
                 else {
                     return @()
                 }
-            } -ModuleName 'CyberShell'
+            } -Verifiable -ModuleName 'CyberShell'
 
             # Mock the Get-AzResource function to return predefined results for testing
             Mock -CommandName 'Get-AzResource' -MockWith {
@@ -68,7 +68,7 @@ InModuleScope $ProjectName {
                 else {
                     return @{ ResourceType = "Provider.Resource3/Type" }
                 }
-            } -ModuleName 'CyberShell'
+            } -Verifiable -ModuleName 'CyberShell'
         }
 
         # Describe the group of tests for property initialization
