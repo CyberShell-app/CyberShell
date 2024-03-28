@@ -14,12 +14,12 @@ Import-Module $ProjectName
 # Define tests within the scope of the project module
 InModuleScope $ProjectName {
 
-     # Describe the group of tests for the ResourceLogCategory class
+    # Describe the group of tests for the ResourceLogCategory class
     Describe 'ResourceLogCategory Class Unit Tests' {
         # Define setup actions to be performed before all tests
         BeforeAll {
 
-             # Define properties for valid and invalid test objects
+            # Define properties for valid and invalid test objects
             $ValidObj1Properties = @{
                 SourceType       = "Az"
                 ContainerId      = "11111111-1111-1111-1111-111111111111"
@@ -69,7 +69,6 @@ InModuleScope $ProjectName {
                     return @{ ResourceId = "00000000-0000-0000-0000-000000000000" }
                 }
             } -ParameterFilter { $ResourceType -eq $this.ResourceTypeName }
-            }
         }
 
         # Describe the group of tests for property initialization
@@ -96,7 +95,7 @@ InModuleScope $ProjectName {
 
         # Describe the group of tests for constructors
         Describe 'ResourceLogCategory Class Constructors Tests' {
-             # Test that the object is created correctly with separate properties
+            # Test that the object is created correctly with separate properties
             It 'Should create the object with separate properties' {
                 { [ResourceLogCategory]::new(
                         $ValidObj1Properties.ContainerId,
@@ -109,10 +108,10 @@ InModuleScope $ProjectName {
             }
         }
 
-          # Describe the group of tests for methods
+        # Describe the group of tests for methods
         Describe 'ResourceLogCategory Class Methods Tests' {
 
-             # Test that the method handles resource types with diagnostic settings available
+            # Test that the method handles resource types with diagnostic settings available
             It 'should handle resource type with diagnostic settings available' {
                 $obj = [ResourceLogCategory]::new($ValidObj1Properties)
                 { $obj.GetDiagnosticSettings() } | Should -Not -Throw
