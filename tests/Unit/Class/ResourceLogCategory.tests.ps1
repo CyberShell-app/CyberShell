@@ -68,6 +68,7 @@ InModuleScope $ProjectName {
                 else {
                     return @{ ResourceId = "00000000-0000-0000-0000-000000000000" }
                 }
+            } -ParameterFilter { $ResourceType -eq $this.ResourceTypeName }
             }
         }
 
