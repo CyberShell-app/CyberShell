@@ -56,17 +56,17 @@ InModuleScope $ProjectName {
             }
 
             # Mock the Get-AzResource function to return predefined results for testing
-            Mock Get-AzResource {
-                param($ResourceType)
+            Mock -CommandName 'Get-AzResource' -MockWith {
+                param($ResourceId)
 
-                if ($ResourceType -eq "Provider.Resource1/Type") {
-                    return @{ ResourceId = "11111111-1111-1111-1111-111111111111" }
+                if ($ResourceId -eq "11111111-1111-1111-1111-111111111111") {
+                    return @{ ResourceType = "Provider.Resource1/Type" }
                 }
-                elseif ($ResourceType -eq "Provider.Resource2/Type") {
-                    return @{ ResourceId = "22222222-2222-2222-2222-222222222222" }
+                elseif ($ResourceId -eq "22222222-2222-2222-2222-222222222222") {
+                    return @{ ResourceType = "Provider.Resource2/Type" }
                 }
                 else {
-                    return @{ ResourceId = "00000000-0000-0000-0000-000000000000" }
+                    return @{ ResourceType = "Provider.Resource3/Type" }
                 }
             }
         }
