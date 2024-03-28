@@ -48,7 +48,7 @@ InModuleScope $ProjectName {
             else {
                 return @()
             }
-        } -Verifiable -RemoveParameterValidation
+        } -Verifiable
 
         # Mock the Get-AzResource function to return predefined results for testing
         Mock -CommandName 'Get-AzResource' -MockWith {
@@ -61,7 +61,7 @@ InModuleScope $ProjectName {
             else {
                 return @{ ResourceType = "Provider.Resource3/Type" }
             }
-        } -Verifiable -RemoveParameterValidation
+        } -Verifiable
     }
     # Describe the group of tests for the ResourceLogCategory class
     Describe 'ResourceLogCategory Class Unit Tests' {
