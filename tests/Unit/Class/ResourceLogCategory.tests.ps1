@@ -36,8 +36,48 @@ InModuleScope $ProjectName {
             SourceType  = "Az"
             ContainerId = "00000000-0000-0000-0000-000000000000"
         }
+        # Directly construct the context with embedded hashtables for account, subscription, and tenant
+        $SimulatedAzcontext = @{
+            Account = @{
+                Id = "admin@contoso.onmicrosoft.com"
+                Type = "User"
+                Tenants = @("99999999-9999-9999-9999-999999999999")
+                ExtendedProperties = @{
+                    Tenants = "99999999-9999-9999-9999-999999999999"
+                    HomeAccountId = "88888888-8888-8888-8888-888888888888.99999999-9999-9999-9999-999999999999"
+                    Subscriptions = ""
+                }
+            }
+            Subscription = @{
+                Id = "77777777-7777-7777-7777-777777777777"
+                Name = "management"
+                State = "Enabled"
+                SubscriptionId = "77777777-7777-7777-7777-777777777777"
+                TenantId = "99999999-9999-9999-9999-999999999999"
+                HomeTenantId = "99999999-9999-9999-9999-999999999999"
+                ManagedByTenantIds = @("99999999-9999-9999-9999-999999999999")
+                AuthorizationSource = "RoleBased"
+            }
+            Tenant = @{
+                Id = "99999999-9999-9999-9999-999999999999"
+                TenantId = "99999999-9999-9999-9999-999999999999"
+            }
+        }
 
-        Mock Connect-AzAccount{}
+        # Construct the custom object and assign the context
+        $azureProfile = [PSCustomObject]@{
+            Context = $simulatedAzcontext
+        }
+
+        # Set the custom type name to mimic the desired Azure profile object
+        $azureProfile.PSTypeNames.Clear()
+        $azureProfile.PSTypeNames.Add("Microsoft.Azure.Commands.Profile.Models.Core.PSAzureProfile")
+
+
+
+        Mock Connect-AzAccount{
+            return $azureProfile
+        }
 
         # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
         Mock -CommandName 'Get-AzDiagnosticSettingCategory' -MockWith {
