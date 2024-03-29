@@ -65,7 +65,7 @@ InModuleScope $ProjectName {
         }
 
         # Construct the custom object and assign the context
-        $azureProfile = [PSCustomObject]@{
+        $azureProfile = @{
             Context = $simulatedAzcontext
         }
 
