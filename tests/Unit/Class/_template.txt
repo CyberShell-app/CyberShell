@@ -15,7 +15,7 @@ Import-Module $ProjectName
 InModuleScope $ProjectName {
 
     # Describe the group of tests for the class
-    Describe '<ClassName> Class Unit Tests' {
+    Describe '<ClassName> Class Unit Tests' -Tags 'UnitQuality'{
         # Define setup actions to be performed before all tests
         BeforeAll {
             # Define properties for valid and invalid test objects
