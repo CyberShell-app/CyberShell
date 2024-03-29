@@ -14,5 +14,8 @@
     ChangelogManagement   = 'latest'
     Sampler               = 'latest'
     'Sampler.GitHubTasks' = 'latest'
+    'Az.Accounts'         = 'latest'
+    'Az.Monitor'          = 'latest'
+    'Az.Resources'        = 'latest'
 }
 
