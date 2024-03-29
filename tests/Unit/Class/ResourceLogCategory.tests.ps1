@@ -37,6 +37,8 @@ InModuleScope $ProjectName {
             ContainerId = "00000000-0000-0000-0000-000000000000"
         }
 
+        Mock Connect-AzAccount{}
+
         # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
         Mock -CommandName 'Get-AzDiagnosticSettingCategory' -MockWith {
             if ($ResourceId -eq "11111111-1111-1111-1111-111111111111") {
@@ -72,6 +74,7 @@ InModuleScope $ProjectName {
         Describe 'ResourceLogCategory Class Property Initialization' {
             # Test that valid data input is validated correctly
             It 'should validate correct data input' {
+                Connect-AzAccount
                 { [ResourceLogCategory]::Validate(
                         $ValidObj1Properties.ContainerId,
                         $ValidObj1Properties.ResourceTypeName,
@@ -79,6 +82,7 @@ InModuleScope $ProjectName {
             }
             # Test that invalid data input is not validated
             It 'should not validate incorrect data input' {
+                Connect-AzAccount
                 { [ResourceLogCategory]::Validate(
                         $InvalidObjProperties.ContainerId,
                         $InvalidObjProperties.ResourceTypeName,
@@ -86,6 +90,7 @@ InModuleScope $ProjectName {
             }
             # Test that empty data input is not validated
             It 'should not validate empty data input' {
+                Connect-AzAccount
                 { [ResourceLogCategory]::Validate('', '', '') } | Should -Throw
             }
         }
