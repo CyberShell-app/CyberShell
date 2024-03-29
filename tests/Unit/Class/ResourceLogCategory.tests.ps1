@@ -75,8 +75,8 @@ InModuleScope $ProjectName {
 
 
 
-        Mock Connect-AzAccount{
-            return $azureProfile
+        Mock Set-AzContext{
+            return @{ Context = $simulatedAzcontext }
         }
 
         # Mock the Get-AzDiagnosticSettingCategory function to return predefined results for testing
@@ -106,7 +106,7 @@ InModuleScope $ProjectName {
         } -Verifiable
     }
     # Describe the group of tests for the ResourceLogCategory class
-    Describe 'ResourceLogCategory Class Unit Tests' {
+    Describe 'ResourceLogCategory Class Unit Tests' -Tag 'UnitQuality' {
         # Define setup actions to be performed before all tests
 
 
@@ -114,7 +114,7 @@ InModuleScope $ProjectName {
         Describe 'ResourceLogCategory Class Property Initialization' {
             # Test that valid data input is validated correctly
             It 'should validate correct data input' {
-                Connect-AzAccount
+                Set-AzContext
                 { [ResourceLogCategory]::Validate(
                         $ValidObj1Properties.ContainerId,
                         $ValidObj1Properties.ResourceTypeName,
@@ -122,15 +122,14 @@ InModuleScope $ProjectName {
             }
             # Test that invalid data input is not validated
             It 'should not validate incorrect data input' {
-                Connect-AzAccount
-                { [ResourceLogCategory]::Validate(
+                Set-AzContext               { [ResourceLogCategory]::Validate(
                         $InvalidObjProperties.ContainerId,
                         $InvalidObjProperties.ResourceTypeName,
                         $InvalidObjProperties.SourceType) } | Should -Throw
             }
             # Test that empty data input is not validated
             It 'should not validate empty data input' {
-                Connect-AzAccount
+                Set-AzContext
                 { [ResourceLogCategory]::Validate('', '', '') } | Should -Throw
             }
         }
