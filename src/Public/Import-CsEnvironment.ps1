@@ -22,6 +22,7 @@ function Import-CsEnvironment {
 .NOTES
    The imported data is stored in a global variable $global:CsData.
 #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Justification = 'Global variable used for $CsData.')]
     [CmdletBinding()]
     param (
         [string]$JsonPath = $null
