@@ -1,7 +1,13 @@
 function Get-CsAzGovAssignment {
     param (
-        [Parameter(Mandatory = $true)]
-        [string]$SubId
+        [Parameter(Position = 0, Mandatory = $true)]
+        [string]$SubId,
+
+        [Parameter(Position = 1, Mandatory = $true)]
+        [System.Collections.Hashtable]$azAPICallConf,
+
+        [Parameter(Position = 2, Mandatory = $true)]
+        [string]$CsEnvironment
     )
 
     # Get the list of security assessments
@@ -10,52 +16,55 @@ function Get-CsAzGovAssignment {
     # Initialize an array to store governance assignments
     $GovAssignments = [System.Collections.ArrayList]::new()
 
+    $counter = 0
+
     # Loop through each security assessment
     foreach ($Assessment in $SecurityAssessmentList) {
+
+        # Increment the counter
+        $counter++
+
+        # Get the assessment details
         $AssessmentName = $Assessment.name
         $AssessmentDisplayName = $Assessment.properties.displayName
         $ResourceScope = $Assessment.properties.resourceDetails.id
 
+        # Display the progress
+        $ProgressPercentage = [math]::Round((($counter / $SecurityAssessmentList.Count) * 100))
+        Write-Progress -Activity "Processing Assessment: $AssessmentDisplayName" -Status "$ProgressPercentage% Completed" -PercentComplete $ProgressPercentage
+
         # Get Assessment Key
         $APIBaseUri = "$($azAPICallConf['azAPIEndpointUrls'].ARM)$ResourceScope/providers/Microsoft.Security/assessments/$AssessmentName/governanceAssignments"
-        $APIUri = "$APIBaseUri/?api-version=2021-06-01"
-        $AssessmentKey = (AzAPICall -uri $APIUri -AzAPICallConfiguration $azAPICallConf -listenOn Content).Name
 
         # Get the Assignment details
         $APIUri = "$APIBaseUri/$AssessmentKey/?api-version=2021-06-01"
-        $Assignment = AzAPICall -uri $APIUri -AzAPICallConfiguration $azAPICallConf -listenOn Content
+        $Assignment = AzAPICall -uri $APIUri -AzAPICallConfiguration $azAPICallConf -listenOn Content -skipOnErrorCode 404
 
         # If the assignment is not null, add it to the list
         if ($null -ne $Assignment) {
-            $GovAssignments.add($Assignment) | Out-Null
+            $APIUri = "$APIBaseUri/?api-version=2021-06-01"
+            $AssignmentKey = (AzAPICall -uri $APIUri -AzAPICallConfiguration $azAPICallConf -listenOn Content).Name
+
+            # Create a new GovAssignment object
+            $GovAssignmentObj = [GovAssignment]::new()
+            $GovAssignmentObj.CsEnvironment = $CsEnvironment
+            $GovAssignmentObj.SourceType = 'Az'
+            $GovAssignmentObj.AssessmentName = $AssessmentName
+            $GovAssignmentObj.AssessmentDisplayName = $AssessmentDisplayName
+            $GovAssignmentObj.AssignedResourceId = $Assignment.properties.assignedResourceId
+            $GovAssignmentObj.ContainerId = $subId
+            $GovAssignmentObj.AssignmentKey = $AssignmentKey
+            $GovAssignmentObj.RemediationDueDate = $Assignment.properties.remediationDueDate
+            $GovAssignmentObj.IsGracePeriod = $Assignment.properties.isGracePeriod
+            $GovAssignmentObj.Owner = $Assignment.properties.owner
+            $GovAssignmentObj.OwnerEmailNotification = $Assignment.properties.governanceAssignmentEmailNotification.disableOwnerEmailNotification
+            $GovAssignmentObj.ManagerEmailNotification = $Assignment.properties.governanceAssignmentEmailNotification.disableManageremailnotification
+            $GovAssignmentObj.NotificationDayOfWeek = $Assignment.properties.governanceAssignmentEmailNotification.notificationDayOfWeek
+
+            # Add the assignment to the list
+            $GovAssignments.add($GovAssignmentObj)
         }
-
-        # Display the progress
-        $ProgressPercentage = [math]::Round((($GovAssignments.Count / $SecurityAssessmentList.Count) * 100))
-        Write-Progress -Activity "Processing Assessment: $AssessmentDisplayName" -Status "$ProgressPercentage% Completed" -PercentComplete $ProgressPercentage
     }
-
-    # Output the list of governance assignments
-    Write-Host "List of Governance Assignments will be updated"
-    $GovAssignments.properties | Select-Object assignedResourceId | Format-List
-
-    # Display the total number of governance assignments
-    Write-Host "Total Governance Assignments: $($GovAssignments.Count)"
-
-    # Update each assignment
-    foreach ($Assignment in $GovAssignments) {
-        $AssignmentId = $Assignment.id
-
-        # Body for update request
-        $Body = @{
-            properties = @{
-                remediationDueDate = "06/29/2024 22:00:00"
-                isGracePeriod      = $true
-            }
-        } | ConvertTo-Json
-
-        Write-Host "Updating Assignment Id: $AssignmentId"
-        $APIUri = "$($azAPICallConf['azAPIEndpointUrls'].ARM)$AssignmentId/?api-version=2021-06-01"
-        AzAPICall -uri $APIUri -AzAPICallConfiguration $azAPICallConf -method PUT -body $Body
-    }
+    Write-Progress -Completed
+    return $GovAssignments
 }
