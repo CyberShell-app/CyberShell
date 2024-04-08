@@ -1,6 +1,54 @@
 function Write-OutputPadded {
+    <#
+.SYNOPSIS
+   Writes colorized and formatted output to the console.
 
+.DESCRIPTION
+   The Write-OutputPadded function writes colorized and formatted output to the console. It supports indentation, centering, and different types of messages (Error, Warning, Success, Information, Data, Debug, Important).
 
+.PARAMETER Text
+   The text to be written to the console.
+
+.PARAMETER IndentLevel
+   The level of indentation for the output text. Default is 0.
+
+.PARAMETER Width
+   The width of the output text. Default is 120.
+
+.PARAMETER Centered
+   If set, the output text will be centered.
+
+.PARAMETER isTitle
+   If set, the output text will be formatted as a title.
+
+.PARAMETER Type
+   The type of the message. It can be one of the following: "Error", "Warning", "Success", "Information", "Data", "Debug", "Important". The type determines the color of the output text.
+
+.EXAMPLE
+   Write-OutputPadded -Text "Title" -isTitle -Type "Important"
+   Writes the text "Title" formatted as a title and colors it as an Important message.
+
+.EXAMPLE
+   Write-OutputPadded -Text "This is a ERROR demo text" -Type "Error" -IndentLevel 2
+   Writes the text "This is a ERROR demo text" with an indentation level of 2 and colors it as an Error message.
+
+.EXAMPLE
+   Write-OutputPadded -Text "This is a WARNING demo text" -Type "Warning" -IndentLevel 2
+   Writes the text "This is a WARNING demo text" with an indentation level of 2 and colors it as a Warning message.
+
+.EXAMPLE
+   Write-OutputPadded -Text "This is a SUCCESS demo text" -Type "Success" -IndentLevel 2
+   Writes the text "This is a SUCCESS demo text" with an indentation level of 2 and colors it as a Success message.
+
+.EXAMPLE
+   Write-OutputPadded -Text "This is a INFORMATION demo text" -Type "Information" -IndentLevel 2
+   Writes the text "This is a INFORMATION demo text" with an indentation level of 2 and colors it as an Information message.
+
+.NOTES
+   The function uses Write-Host for colorized output formatting.
+#>
+
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "", Justification = "Write-Host used for colorized output formatting.")]
     [CmdletBinding()]
     param (
         [Parameter(Position = 0, Mandatory = $true)]
