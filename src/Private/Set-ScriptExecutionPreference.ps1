@@ -24,7 +24,7 @@ function Set-ScriptExecutionPreference {
 .NOTES
    The function changes the script scope variables $script:VerbosePreference and $script:DebugPreference.
 #>
-
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Justification = "This function only changes script scope variables")]
     [CmdletBinding()]
     param (
         [ValidateSet("Information", "Verbose", "Debug")]
@@ -44,16 +44,4 @@ function Set-ScriptExecutionPreference {
         $script:DebugPreference = "SilentlyContinue"
     }
 
-    # Information
-    # Standard
-    # Information
-    # success
-    # warning
-    # error
-    # Critical
-    # verbose
-    # Verbose
-    # debug
-    # Debug
-    # Data
 }
