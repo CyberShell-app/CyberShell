@@ -3,7 +3,7 @@
 The format is based on and uses the types of changes according to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.2.0]
+## [0.2.0] - 2024-04-08
 
 ### Added
 
@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Set-CsConfig`: Create or update configuration files to adjust PowerShell environment settings as needed.
 - `Set-ScriptExecutionPreference`: Control script execution policies within scripts scope for improved display of verbose and debug messages
 
-## [v0.1.0-preview]
+## [0.1.0-preview] - 2024-04-02
 
 ### Added
 
