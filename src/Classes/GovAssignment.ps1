@@ -26,12 +26,6 @@ class GovAssignment {
         if ([string]::IsNullOrEmpty($AssignedResourceId)) { $errors += "AssignedResourceId cannot be null or empty" }
         if ([string]::IsNullOrEmpty($ContainerId)) { $errors += "ContainerId cannot be null or empty" }
         if ([string]::IsNullOrEmpty($AssignmentKey)) { $errors += "AssignmentKey cannot be null or empty" }
-        if ([datetime]::IsNullOrEmpty($RemediationDueDate)) { $errors += "RemediationDueDate cannot be null or empty" }
-        if ([bool]::IsNullOrEmpty($IsGracePeriod)) { $errors += "IsGracePeriod cannot be null or empty" }
-        if ([string]::IsNullOrEmpty($Owner)) { $errors += "Owner cannot be null or empty" }
-        if ([bool]::IsNullOrEmpty($OwnerEmailNotification)) { $errors += "OwnerEmailNotification cannot be null or empty" }
-        if ([bool]::IsNullOrEmpty($ManagerEmailNotification)) { $errors += "ManagerEmailNotification cannot be null or empty" }
-        if ([string]::IsNullOrEmpty($NotificationDayOfWeek)) { $errors += "NotificationDayOfWeek cannot be null or empty" }
 
 
         if ($errors.Count -gt 0) {
