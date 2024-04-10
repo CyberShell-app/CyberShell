@@ -56,48 +56,7 @@
 - [ ] Unit tests added/updated. See [CyberShell Module Testing Guidelines](https://github.com/PowerShell/DscResources/blob/master/TestsGuidelines.md).
 - [ ] Integration tests added/updated (where possible). See [CyberShell Module Testing Guidelines](https://github.com/PowerShell/DscResources/blob/master/TestsGuidelines.md).
 
+---
 
-
-
--------------
-# Pull Request
-
-<!--
-Thank you for contributing! Please use a descriptive title and fill out this template to ensure a thorough review process.
-
-**Title Guidelines**: Be clear and succinct. Use the prefix [BREAKING CHANGE] for significant updates.
-
--->
-
-## PR Description
-
-<!-- Briefly describe your changes, details will be provided in next section -->
-
-### Changes
-<!--
-list the changes as per keepachangelog.com This **should** duplicate what you've updated in the changelog file.`.
-
-### Added
-- New features.
-### Changed
-- Updates to existing functionality.
-### Deprecated
-- Features marked for removal.
-### Security
-- Security fixes.
-### Fixed
-- Bug fixes.
-### Removed
-- Removed features or code.
--->
-
-## Checklist
-
-- [ ] Single logical change.
-- [ ] Changelog updated (Unreleased section as per keepachangelog.com).
-- [ ] Build passes (`build.ps1 -ResolveDependency`).
-- [ ] Documentation updated in `src/WikiSource`.
-- [ ] Comment-based help in `.ps1` files.
-- [ ] Unit and integration tests updated/added.
 
 <!-- Your contribution is appreciated! - Thank you->
