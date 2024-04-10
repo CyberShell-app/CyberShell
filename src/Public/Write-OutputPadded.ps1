@@ -24,6 +24,9 @@ function Write-OutputPadded {
 .PARAMETER Type
    The type of the message. It can be one of the following: "Error", "Warning", "Success", "Information", "Data", "Debug", "Important". The type determines the color of the output text.
 
+.PARAMETER BlankLineBefore
+    If set, a blank line will be written before the output text.
+
 .EXAMPLE
    Write-OutputPadded -Text "Title" -isTitle -Type "Important"
    Writes the text "Title" formatted as a title and colors it as an Important message.
