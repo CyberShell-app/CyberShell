@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `Get-CsAzGovAssignment` to get azure governance assignments
+
 ### Changed
 - `Write-OutputPadded`: improve message handling
 - `Import-CsEnvironment`: add capability to specify custom path for the config file using the CYBERSHELL_CONFIG environment variable
