@@ -30,15 +30,26 @@ function Import-CsEnvironment {
 
     Write-OutputPadded "Importing CyberShell Environment" -isTitle -Type "Information"
 
-    # If no JSON path is specified, default to the CyberShell-Config.jsonc file
+    # If a JSON path is explicitly specified, use it
+    # If not, check for the CUBERSHELL_CONFIG environment variable
+    # If the environment variable is not set, default to the CyberShell-Config.jsonc file
     # in the .cybershell directory of the user's home directory
-    if ([string]::IsNullOrEmpty($JsonPath)) {
+    if (-not [string]::IsNullOrEmpty($JsonPath)) {
+        Write-OutputPadded "Config file explicitly specified in Cmdlet" -IndentLevel 1 -Type "Debug" -BlankLineBefore
+
+    }
+    elseif ($env:CYBERSHELL_CONFIG) {
+        $JsonPath = $env:CYBERSHELL_CONFIG
+        Write-OutputPadded "Using JsonPath from CYBERSHELL_CONFIG environment variable" -IndentLevel 1 -Type "Debug"
+    }
+    else {
         $JsonFolder = Join-Path $HOME ".cybershell"
         $JsonPath = Join-Path $JsonFolder "CyberShell-Config.jsonc"
-        Write-Debug "JsonPath: $JsonPath"
+        Write-OutputPadded "Using default JsonPath: $JsonPath" -IndentLevel 1 -Type "Debug"
     }
+    Write-OutputPadded "$JsonPath" -IndentLevel 1 -Type "Debug"
 
-    Write-OutputPadded "Importing configuration from: $JsonPath"  -IndentLevel 1 -Type "Debug"
+    Write-OutputPadded "Importing configuration from Json" -IndentLevel 1 -Type "Debug" -BlankLineBefore
 
     # Verifying the file exists
     if (-Not (Test-Path $JsonPath)) {
@@ -52,24 +63,38 @@ function Import-CsEnvironment {
         # Convert JSON content to a hashtable for structured access
         [hashtable]$rawData = $jsonContent | ConvertFrom-Json -AsHashtable
         Write-OutputPadded "CyberShell environments and configuration successfully imported." -IndentLevel 1 -Type "Success"
-        Write-OutputPadded " "
     }
     catch {
         Write-OutputPadded "Failed to import CyberShell environments and configuration from JSON: $_" -IndentLevel 1 -Type "Error"
-        Write-OutputPadded " "
     }
 
     # Structured global data storage
     $global:CsData = @{
-        "Environments"  = $rawData["CyberShellEnvironments"];
-        "Settings" = $rawData["Settings"];
+        "Environments" = $rawData["CyberShellEnvironments"];
+        "Settings"     = $rawData["Settings"];
     }
+
+    # Debug output for imported data
+    Write-OutputPadded "Environment loaded:" -IndentLevel 1 -Type "Debug" -BlankLineBefore
+    Write-OutputPadded "Environment: $($global:CsData.Environments | ConvertTo-Json)" -IndentLevel 1 -Type "Data"
+
+    # debug output for settings
+
+    # if settings exist, output them
+    if ($global:CsData.Settings) {
+        Write-OutputPadded "Settings loaded:" -IndentLevel 1 -Type "Debug" -BlankLineBefore
+        Write-OutputPadded "Settings: $($global:CsData.Settings | ConvertTo-Json) " -IndentLevel 1 -Type "Data"
+    }
+    else {
+        Write-OutputPadded "No settings found in the config file." -IndentLevel 1 -Type "Debug"
+    }
+
 
     # CSData.settings.ExecutionPreference exist then set the script execution preference
     if ($global:CsData.Settings.ExecutionPreference) {
         Set-ScriptExecutionPreference -ExecutionPreference $global:CsData.Settings.ExecutionPreference
         Write-OutputPadded "Script execution preference set to $($global:CsData.Settings.ExecutionPreference)" -IndentLevel 1 -Type "Debug"
-        write-OutputPadded " " -Type "Debug"
+        Write-OutputPadded " " -Type "Debug"
     }
 
 
@@ -80,10 +105,9 @@ function Import-CsEnvironment {
         Write-OutputPadded "Debug and verbose Informations:" -IndentLevel 1 -Type "Debug"
     }
 
-    Write-OutputPadded "JsonFolder: $JsonFolder" -IndentLevel 2 -Type "Debug"
     Write-OutputPadded "JsonPath: $JsonPath" -IndentLevel 2 -Type "Debug"
-    Write-OutputPadded "Imported CyberShell Data: $(ConvertTo-Json $global:CsData -Depth 20)" -IndentLevel 2 -Type "Data"
+
+    Write-OutputPadded "Imported CyberShell Data:" -IndentLevel 2 -Type "Debug" -BlankLineBefore
+    Write-OutputPadded "$(ConvertTo-Json $global:CsData -Depth 20)" -IndentLevel 2 -Type "Data"
 
 }
-
-
