@@ -24,6 +24,9 @@ function Write-OutputPadded {
 .PARAMETER Type
    The type of the message. It can be one of the following: "Error", "Warning", "Success", "Information", "Data", "Debug", "Important". The type determines the color of the output text.
 
+.PARAMETER BlankLineBefore
+    If set, a blank line will be written before the output text.
+
 .EXAMPLE
    Write-OutputPadded -Text "Title" -isTitle -Type "Important"
    Writes the text "Title" formatted as a title and colors it as an Important message.
@@ -67,9 +70,20 @@ function Write-OutputPadded {
         [switch]$isTitle = $false,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("Error", "Warning", "Success", "Information", "Data", "Debug", "Important")]
-        [string]$Type
+        [ValidateSet("Information", "Success", "Warning", "Error", "Important", "Verbose", "Debug", "Data")]
+        [string]$Type,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$BlankLineBefore = $false
+
     )
+
+    # Skip if the message type is "Debug" or "Data" and the debug preference is false
+    # or if the message type is "Verbose" and the verbose preference is false
+    if ((($Type -eq "Debug" -or $Type -eq "Data") -and $script:DebugPreference -ne "Continue") -or
+        ($Type -eq "Verbose" -and $script:VerbosePreference -ne "Continue")) {
+        return
+    }
 
     $indentation = $IndentLevel * 4
     $effectiveWidth = $Width - $indentation
@@ -83,6 +97,10 @@ function Write-OutputPadded {
         else {
             $wrappedLines += $line -replace "(?<=\S{$effectiveWidth})(\S)", "`$1`n"
         }
+    }
+
+    if ($BlankLineBefore) {
+        Write-Host ""
     }
 
     if ($isTitle) {
@@ -109,29 +127,37 @@ function Write-OutputPadded {
         Write-Host -NoNewline $linePadding
 
         switch ($Type) {
-
-            "Error" {
-                Write-Host $line -ForegroundColor Red
-            }
-            "Success" {
-                Write-Host $line -ForegroundColor Green
-            }
             "Information" {
                 Write-Host $line -ForegroundColor Cyan
             }
-            "Data" {
-                Write-Host $line -ForegroundColor Magenta
-            }
-            "Debug" {
-                Write-Host $line -ForegroundColor DarkGray
+            "Success" {
+                Write-Host $line -ForegroundColor Green
             }
             "Warning" {
                 Write-Host $line -ForegroundColor Black -BackgroundColor DarkYellow -NoNewline
                 Write-Host " "
             }
+            "Error" {
+                Write-Host $line -ForegroundColor Red
+            }
             "Important" {
                 Write-Host $line -ForegroundColor White -BackgroundColor DarkRed -NoNewline
                 Write-Host " "
+            }
+            "Verbose" {
+                if ($script:VerbosePreference -eq "Continue") {
+                    Write-Host $line -ForegroundColor DarkGray
+                }
+            }
+            "Debug" {
+                if ($script:DebugPreference -eq "Continue") {
+                    Write-Host $line -ForegroundColor DarkGray
+                }
+            }
+            "Data" {
+                if ($script:DebugPreference -eq "Continue") {
+                    Write-Host $line -ForegroundColor Magenta
+                }
             }
             default { Write-Host $line }
         }
