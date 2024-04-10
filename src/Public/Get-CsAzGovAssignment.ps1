@@ -1,4 +1,34 @@
 function Get-CsAzGovAssignment {
+    <#
+.SYNOPSIS
+    Retrieves Azure Governance Assignments.
+
+.DESCRIPTION
+    This function retrieves the list of security assessments from Azure and stores the governance assignments.
+
+.PARAMETER SubId
+    The subscription ID for which the security assessments are to be retrieved.
+
+.PARAMETER azAPICallConf
+    A hashtable containing the configuration for the Azure API call.
+
+.PARAMETER CsEnvironment
+    The environment for which the function is being run.
+
+.EXAMPLE
+    Get-CsAzGovAssignment -SubId "your-subscription-id" -azAPICallConf $yourConfig -CsEnvironment "your-environment"
+
+.INPUTS
+    String, Hashtable, String
+
+.OUTPUTS
+    ArrayList
+    Returns an ArrayList of governance assignments.
+
+.NOTES
+    This function makes use of the AzAPICall function to make the API call to Azure.
+#>
+
     param (
         [Parameter(Position = 0, Mandatory = $true)]
         [string]$SubId,
@@ -7,64 +37,84 @@ function Get-CsAzGovAssignment {
         [System.Collections.Hashtable]$azAPICallConf,
 
         [Parameter(Position = 2, Mandatory = $true)]
-        [string]$CsEnvironment
+        [string]$CsEnvironment,
+
+        [Parameter()]
+        [switch]$OverdueOnly
     )
 
-    # Get the list of security assessments
-    $SecurityAssessmentList = AzAPICall -uri "$($azAPICallConf['azAPIEndpointUrls'].ARM)/subscriptions/$SubId/providers/Microsoft.Security/assessments?api-version=2021-06-01" -AzAPICallConfiguration $azAPICallConf -listenOn Value
+    Write-OutputPadded "Governance Assignments" -IndentLevel 1 -isTitle -Type "Information"
 
-    # Initialize an array to store governance assignments
-    $GovAssignments = [System.Collections.ArrayList]::new()
-
-    $counter = 0
-
-    # Loop through each security assessment
-    foreach ($Assessment in $SecurityAssessmentList) {
-
-        # Increment the counter
-        $counter++
-
-        # Get the assessment details
-        $AssessmentName = $Assessment.name
-        $AssessmentDisplayName = $Assessment.properties.displayName
-        $ResourceScope = $Assessment.properties.resourceDetails.id
-
-        # Display the progress
-        $ProgressPercentage = [math]::Round((($counter / $SecurityAssessmentList.Count) * 100))
-        Write-Progress -Activity "Processing Assessment: $AssessmentDisplayName" -Status "$ProgressPercentage% Completed" -PercentComplete $ProgressPercentage
-
-        # Get Assessment Key
-        $APIBaseUri = "$($azAPICallConf['azAPIEndpointUrls'].ARM)$ResourceScope/providers/Microsoft.Security/assessments/$AssessmentName/governanceAssignments"
-
-        # Get the Assignment details
-        $APIUri = "$APIBaseUri/$AssessmentKey/?api-version=2021-06-01"
-        $Assignment = AzAPICall -uri $APIUri -AzAPICallConfiguration $azAPICallConf -listenOn Content -skipOnErrorCode 404
-
-        # If the assignment is not null, add it to the list
-        if ($null -ne $Assignment) {
-            $APIUri = "$APIBaseUri/?api-version=2021-06-01"
-            $AssignmentKey = (AzAPICall -uri $APIUri -AzAPICallConfiguration $azAPICallConf -listenOn Content).Name
-
-            # Create a new GovAssignment object
-            $GovAssignmentObj = [GovAssignment]::new()
-            $GovAssignmentObj.CsEnvironment = $CsEnvironment
-            $GovAssignmentObj.SourceType = 'Az'
-            $GovAssignmentObj.AssessmentName = $AssessmentName
-            $GovAssignmentObj.AssessmentDisplayName = $AssessmentDisplayName
-            $GovAssignmentObj.AssignedResourceId = $Assignment.properties.assignedResourceId
-            $GovAssignmentObj.ContainerId = $subId
-            $GovAssignmentObj.AssignmentKey = $AssignmentKey
-            $GovAssignmentObj.RemediationDueDate = $Assignment.properties.remediationDueDate
-            $GovAssignmentObj.IsGracePeriod = $Assignment.properties.isGracePeriod
-            $GovAssignmentObj.Owner = $Assignment.properties.owner
-            $GovAssignmentObj.OwnerEmailNotification = $Assignment.properties.governanceAssignmentEmailNotification.disableOwnerEmailNotification
-            $GovAssignmentObj.ManagerEmailNotification = $Assignment.properties.governanceAssignmentEmailNotification.disableManageremailnotification
-            $GovAssignmentObj.NotificationDayOfWeek = $Assignment.properties.governanceAssignmentEmailNotification.notificationDayOfWeek
-
-            # Add the assignment to the list
-            $GovAssignments.add($GovAssignmentObj)
-        }
+    if ($OverdueOnly) {
+        Write-OutputPadded "OverdueOnly Parameter set" -IndentLevel 1 -Type "Verbose"
+        $completionStatus = "'Overdue'"
     }
-    Write-Progress -Completed
+    else {
+        $completionStatus = "'OnTime', 'Overdue', 'Unassigned', 'Completed'"
+    }
+
+    # Get the Governance Assignments list
+    $query = @"
+     securityresources
+        | where type =~ 'microsoft.security/assessments'
+        | extend assessmentType = tostring(properties.metadata.assessmentType),
+                assessmentId = tolower(id),
+                statusCode = tostring(properties.status.code),
+                source = trim(' ', tolower(tostring(properties.resourceDetails.Source))),
+                resourceId = trim(' ', tolower(tostring(properties.resourceDetails.Id))),
+                resourceName = tostring(properties.resourceDetails.ResourceName),
+                resourceType = tolower(properties.resourceDetails.ResourceType),
+                displayName = tostring(properties.displayName),
+                assessmentKey = tostring(split(id, '/')[-1])
+        | where assessmentType == 'BuiltIn'
+        | extend environment = case(
+            source in~ ('azure', 'onpremise'), 'Azure',
+            source =~ 'aws', 'AWS',
+            source =~ 'gcp', 'GCP',
+            source =~ 'github', 'GitHub',
+            source =~ 'gitlab', 'GitLab',
+            source =~ 'azuredevops', 'AzureDevOps',
+            dynamic(null)
+        )
+        | where environment in~ ('AWS', 'Azure', 'AzureDevOps', 'GCP', 'GitHub', 'GitLab')
+        | join kind=leftouter (
+            securityresources
+            | where type == 'microsoft.security/assessments/governanceassignments'
+            | extend dueDate = todatetime(properties.remediationDueDate),
+                    owner = tostring(properties.owner),
+                    disableOwnerEmailNotification = tostring(properties.governanceEmailNotification.disableOwnerEmailNotification),
+                    disableManagerEmailNotification = tostring(properties.governanceEmailNotification.disableManagerEmailNotification),
+                    emailNotificationDayOfWeek = tostring(properties.governanceEmailNotification.emailNotificationDayOfWeek),
+                    governanceStatus = case(
+                        isnull(todatetime(properties.remediationDueDate)), 'NoDueDate',
+                        todatetime(properties.remediationDueDate) >= bin(now(), 1d), 'OnTime',
+                        'Overdue'
+                    ),
+                    assessmentId = tolower(tostring(properties.assignedResourceId))
+            | project dueDate, owner, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek, governanceStatus, assessmentId
+        ) on assessmentId
+        | extend completionStatus = case(
+            governanceStatus == 'Overdue', 'Overdue',
+            governanceStatus == 'OnTime', 'OnTime',
+            statusCode == 'Unhealthy', 'Unassigned',
+            'Completed'
+        )
+        | where completionStatus in~ ($completionStatus)
+        | project displayName, resourceId, assessmentKey, resourceType, resourceName, dueDate, owner, completionStatus
+        | order by completionStatus, displayName
+"@
+
+    $payLoad = @"
+    {
+        "query": "$($query)"
+    }
+"@
+
+    Write-OutputPadded "Query Payload:" -Type 'debug' -IndentLevel 1 -BlankLineBefore
+    Write-OutputPadded "$payLoad" -Type 'data' -IndentLevel 1 -BlankLineBefore
+
+    $uri = "$($azapicallconf.azAPIEndpointUrls.ARM)/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01"
+    $GovAssignments = AzAPICall -AzAPICallConfiguration $azapiCallConf -uri $uri -body $payLoad -method 'POST' -listenOn Content
+
     return $GovAssignments
 }
