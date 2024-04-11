@@ -79,6 +79,7 @@ function Get-CsAzGovAssignment {
             securityresources
             | where type == 'microsoft.security/assessments/governanceassignments'
             | extend dueDate = todatetime(properties.remediationDueDate),
+                    isGracePeriod = tobool(properties.isGracePeriod),
                     owner = tostring(properties.owner),
                     disableOwnerEmailNotification = tostring(properties.governanceEmailNotification.disableOwnerEmailNotification),
                     disableManagerEmailNotification = tostring(properties.governanceEmailNotification.disableManagerEmailNotification),
@@ -89,7 +90,7 @@ function Get-CsAzGovAssignment {
                         'Overdue'
                     ),
                     assessmentId = tolower(tostring(properties.assignedResourceId))
-            | project dueDate, owner, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek, governanceStatus, assessmentId
+            | project dueDate, isGracePeriod, owner, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek, governanceStatus, assessmentId
         ) on assessmentId
         | extend completionStatus = case(
             governanceStatus == 'Overdue', 'Overdue',
@@ -98,7 +99,7 @@ function Get-CsAzGovAssignment {
             'Completed'
         )
         | where completionStatus in~ ($completionStatus)
-        | project displayName, resourceId, assessmentKey, resourceType, resourceName, dueDate, owner, completionStatus
+        | project displayName, resourceId, assessmentKey, resourceType, resourceName, dueDate, isGracePeriod, owner, completionStatus
         | order by completionStatus, displayName
 "@
 
@@ -112,31 +113,7 @@ function Get-CsAzGovAssignment {
     Write-OutputPadded "$payLoad" -Type 'data' -IndentLevel 1 -BlankLineBefore
 
     $uri = "$($azapicallconf.azAPIEndpointUrls.ARM)/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01"
-    $queryResult = AzAPICall -AzAPICallConfiguration $azapiCallConf -uri $uri -body $payLoad -method 'POST' -listenOn Content
-
-    $GovAssignments = [System.Collections.ArrayList]::new()
-
-    foreach ($assignment in $queryResult) {
-
-        $GovAssignmentObj = [GovAssignment]::new()
-        $GovAssignmentObj.CsEnvironment = $CsEnvironment
-        $GovAssignmentObj.SourceType = 'Az'
-        $GovAssignmentObj.AssessmentName = $assignment.assessmentKey
-        $GovAssignmentObj.AssessmentDisplayName = $assignment.displayName
-        $GovAssignmentObj.AssignedResourceId = $assignment.resourceId
-        $GovAssignmentObj.ContainerId = $assignment.resourceId.split("/")[2]
-        $GovAssignmentObj.AssignmentKey = $assignment.assessmentKey
-        $GovAssignmentObj.RemediationDueDate = $assignment.dueDate
-        $GovAssignmentObj.IsGracePeriod = $assignment.isGracePeriod
-        $GovAssignmentObj.Owner = $assignment.owner
-        $GovAssignmentObj.OwnerEmailNotification = $assignment.disableOwnerEmailNotification
-        $GovAssignmentObj.ManagerEmailNotification = $assignment.disableManageremailnotification
-        $GovAssignmentObj.NotificationDayOfWeek = $assignment.notificationDayOfWeek
-
-        # Add the assignment to the list
-        $GovAssignments.add($GovAssignmentObj)
-        $assignment | Add-Member -MemberType NoteProperty -Name "Environment" -Value $CsEnvironment
-    }
+    $GovAssignments = AzAPICall -AzAPICallConfiguration $azapiCallConf -uri $uri -body $payLoad -method 'POST' -listenOn Content
 
     return $GovAssignments
 }
