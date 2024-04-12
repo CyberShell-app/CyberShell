@@ -41,10 +41,10 @@ function Get-CsAzGovAssignment {
         [switch]$OverdueOnly
     )
 
-    Write-OutputPadded "Governance Assignments" -IndentLevel 1 -isTitle -Type "Information"
+    Write-OutputPadded "Governance Assignments" -IdentLevel 1 -isTitle -Type "Information"
 
     if ($OverdueOnly) {
-        Write-OutputPadded "OverdueOnly Parameter set" -IndentLevel 1 -Type "Verbose"
+        Write-OutputPadded "OverdueOnly Parameter set" -IdentLevel 1 -Type "Verbose"
         $completionStatus = "'Overdue'"
     }
     else {
@@ -110,8 +110,8 @@ function Get-CsAzGovAssignment {
     }
 "@
 
-    Write-OutputPadded "Query Payload:" -Type 'debug' -IndentLevel 1 -BlankLineBefore
-    Write-OutputPadded "$payLoad" -Type 'data' -IndentLevel 1 -BlankLineBefore
+    Write-OutputPadded "Query Payload:" -Type 'debug' -IdentLevel 1 -BlankLineBefore
+    Write-OutputPadded "$payLoad" -Type 'data' -IdentLevel 1 -BlankLineBefore
 
     $uri = "$($azapicallconf.azAPIEndpointUrls.ARM)/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01"
     $GovAssignments = AzAPICall -AzAPICallConfiguration $azapiCallConf -uri $uri -body $payLoad -method 'POST' -listenOn Content
