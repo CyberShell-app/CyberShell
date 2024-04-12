@@ -57,13 +57,13 @@ function Get-CsAzGovAssignment {
         | where type =~ 'microsoft.security/assessments'
         | extend assessmentType = tostring(properties.metadata.assessmentType),
                 assessmentId = tolower(id),
+                assessmentName = tostring(name),
                 statusCode = tostring(properties.status.code),
                 source = trim(' ', tolower(tostring(properties.resourceDetails.Source))),
                 resourceId = trim(' ', tolower(tostring(properties.resourceDetails.Id))),
                 resourceName = tostring(properties.resourceDetails.ResourceName),
                 resourceType = tolower(properties.resourceDetails.ResourceType),
-                displayName = tostring(properties.displayName),
-                assessmentKey = tostring(split(id, '/')[-1])
+                displayName = tostring(properties.displayName)
         | where assessmentType == 'BuiltIn'
         | extend environment = case(
             source in~ ('azure', 'onpremise'), 'Azure',
@@ -89,8 +89,9 @@ function Get-CsAzGovAssignment {
                         todatetime(properties.remediationDueDate) >= bin(now(), 1d), 'OnTime',
                         'Overdue'
                     ),
-                    assessmentId = tolower(tostring(properties.assignedResourceId))
-            | project dueDate, isGracePeriod, owner, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek, governanceStatus, assessmentId
+                    assessmentId = tolower(tostring(properties.assignedResourceId)),
+                    assignmentKey = tostring(properties.assignmentKey)
+            | project dueDate, isGracePeriod, owner, disableOwnerEmailNotification, disableManagerEmailNotification, governanceStatus, assessmentId, assignmentKey, emailNotificationDayOfWeek
         ) on assessmentId
         | extend completionStatus = case(
             governanceStatus == 'Overdue', 'Overdue',
@@ -99,8 +100,8 @@ function Get-CsAzGovAssignment {
             'Completed'
         )
         | where completionStatus in~ ($completionStatus)
-        | project displayName, resourceId, assessmentKey, resourceType, resourceName, dueDate, isGracePeriod, owner, completionStatus
-        | order by completionStatus, displayName
+        | project resourceId,assessmentName, assignmentKey,displayName, completionStatus, resourceType, resourceName, owner, dueDate, isGracePeriod, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek
+        | order by completionStatus, displayName, owner
 "@
 
     $payLoad = @"
