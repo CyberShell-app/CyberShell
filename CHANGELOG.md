@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `Get-CsAzGovAssignment` to get azure governance assignments
+- Automatic documentation generation
 
 ### Changed
 - `Write-OutputPadded`: improve message handling
