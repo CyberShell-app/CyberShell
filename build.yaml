@@ -166,3 +166,8 @@ DscResource.DocGenerator:
       - '_(.+?)_' # Match Italic (underscore)
       - '\*\*(.+?)\*\*' # Match bold
       - '\*(.+?)\*' # Match Italic (asterisk)
+  Publish_GitHub_Wiki_Content:
+    Debug: true
+  Generate_Wiki_Sidebar:
+     Debug: false
+     AlwaysOverwrite: true
