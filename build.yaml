@@ -150,8 +150,8 @@ TaskHeader: |
 GitHubConfig:
   GitHubFilesToAdd:
     - 'CHANGELOG.md'
-  GitHubConfigUserName: csbot
-  GitHubConfigUserEmail: csboty@noreply.com
+  GitHubConfigUserName: fslef
+  GitHubConfigUserEmail: fts+github@lefebvre.co
   UpdateChangelogOnPrerelease: false
 
 ####################################################
