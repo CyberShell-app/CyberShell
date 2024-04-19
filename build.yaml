@@ -147,6 +147,12 @@ TaskHeader: |
   Write-Build DarkGray "  $Path"
   Write-Build DarkGray "  $($Task.InvocationInfo.ScriptName):$($Task.InvocationInfo.ScriptLineNumber)"
   ""
+GitHubConfig:
+  GitHubFilesToAdd:
+    - 'CHANGELOG.md'
+  GitHubConfigUserName: csbot
+  GitHubConfigUserEmail: csboty@noreply.com
+  UpdateChangelogOnPrerelease: false
 
 ####################################################
 #      DscResource.DocGenerator Configuration      #
