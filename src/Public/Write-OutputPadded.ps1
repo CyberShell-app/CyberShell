@@ -9,7 +9,7 @@ function Write-OutputPadded {
 .PARAMETER Text
    The text to be written to the console.
 
-.PARAMETER IndentLevel
+.PARAMETER IdentLevel
    The level of indentation for the output text. Default is 0.
 
 .PARAMETER Width
@@ -32,19 +32,19 @@ function Write-OutputPadded {
    Writes the text "Title" formatted as a title and colors it as an Important message.
 
 .EXAMPLE
-   Write-OutputPadded -Text "This is a ERROR demo text" -Type "Error" -IndentLevel 2
+   Write-OutputPadded -Text "This is a ERROR demo text" -Type "Error" -IdentLevel 2
    Writes the text "This is a ERROR demo text" with an indentation level of 2 and colors it as an Error message.
 
 .EXAMPLE
-   Write-OutputPadded -Text "This is a WARNING demo text" -Type "Warning" -IndentLevel 2
+   Write-OutputPadded -Text "This is a WARNING demo text" -Type "Warning" -IdentLevel 2
    Writes the text "This is a WARNING demo text" with an indentation level of 2 and colors it as a Warning message.
 
 .EXAMPLE
-   Write-OutputPadded -Text "This is a SUCCESS demo text" -Type "Success" -IndentLevel 2
+   Write-OutputPadded -Text "This is a SUCCESS demo text" -Type "Success" -IdentLevel 2
    Writes the text "This is a SUCCESS demo text" with an indentation level of 2 and colors it as a Success message.
 
 .EXAMPLE
-   Write-OutputPadded -Text "This is a INFORMATION demo text" -Type "Information" -IndentLevel 2
+   Write-OutputPadded -Text "This is a INFORMATION demo text" -Type "Information" -IdentLevel 2
    Writes the text "This is a INFORMATION demo text" with an indentation level of 2 and colors it as an Information message.
 
 .NOTES
@@ -58,7 +58,7 @@ function Write-OutputPadded {
         [string]$Text,
 
         [Parameter(Position = 1, Mandatory = $false)]
-        [int]$IndentLevel = 0,
+        [int]$IdentLevel = 0,
 
         [Parameter(Mandatory = $false)]
         [int]$Width = 120,
@@ -85,19 +85,22 @@ function Write-OutputPadded {
         return
     }
 
-    $indentation = $IndentLevel * 4
+    $indentation = $IdentLevel * 4
     $effectiveWidth = $Width - $indentation
-    $lines = $Text -split '\r?\n'
     $wrappedLines = @()
 
-    foreach ($line in $lines) {
-        if ($line.Length -le $effectiveWidth) {
-            $wrappedLines += $line
-        }
-        else {
-            $wrappedLines += $line -replace "(?<=\S{$effectiveWidth})(\S)", "`$1`n"
+    if ($Text.Length -le $effectiveWidth) {
+        $wrappedLines += $Text
+    }
+    else {
+        $numLines = [math]::Ceiling($Text.Length / $effectiveWidth)
+        for ($i = 0; $i -lt $numLines; $i++) {
+            $start = $i * $effectiveWidth
+            $length = [math]::Min($effectiveWidth, $Text.Length - $start)
+            $wrappedLines += $Text.Substring($start, $length)
         }
     }
+
 
     if ($BlankLineBefore) {
         Write-Host ""

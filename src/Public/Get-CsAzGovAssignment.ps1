@@ -41,10 +41,10 @@ function Get-CsAzGovAssignment {
         [switch]$OverdueOnly
     )
 
-    Write-OutputPadded "Governance Assignments" -IndentLevel 1 -isTitle -Type "Information"
+    Write-OutputPadded "Governance Assignments" -IdentLevel 1 -isTitle -Type "Information"
 
     if ($OverdueOnly) {
-        Write-OutputPadded "OverdueOnly Parameter set" -IndentLevel 1 -Type "Verbose"
+        Write-OutputPadded "OverdueOnly Parameter set" -IdentLevel 1 -Type "Verbose"
         $completionStatus = "'Overdue'"
     }
     else {
@@ -57,13 +57,13 @@ function Get-CsAzGovAssignment {
         | where type =~ 'microsoft.security/assessments'
         | extend assessmentType = tostring(properties.metadata.assessmentType),
                 assessmentId = tolower(id),
+                assessmentName = tostring(name),
                 statusCode = tostring(properties.status.code),
                 source = trim(' ', tolower(tostring(properties.resourceDetails.Source))),
                 resourceId = trim(' ', tolower(tostring(properties.resourceDetails.Id))),
                 resourceName = tostring(properties.resourceDetails.ResourceName),
                 resourceType = tolower(properties.resourceDetails.ResourceType),
-                displayName = tostring(properties.displayName),
-                assessmentKey = tostring(split(id, '/')[-1])
+                displayName = tostring(properties.displayName)
         | where assessmentType == 'BuiltIn'
         | extend environment = case(
             source in~ ('azure', 'onpremise'), 'Azure',
@@ -79,6 +79,7 @@ function Get-CsAzGovAssignment {
             securityresources
             | where type == 'microsoft.security/assessments/governanceassignments'
             | extend dueDate = todatetime(properties.remediationDueDate),
+                    isGracePeriod = tobool(properties.isGracePeriod),
                     owner = tostring(properties.owner),
                     disableOwnerEmailNotification = tostring(properties.governanceEmailNotification.disableOwnerEmailNotification),
                     disableManagerEmailNotification = tostring(properties.governanceEmailNotification.disableManagerEmailNotification),
@@ -88,8 +89,9 @@ function Get-CsAzGovAssignment {
                         todatetime(properties.remediationDueDate) >= bin(now(), 1d), 'OnTime',
                         'Overdue'
                     ),
-                    assessmentId = tolower(tostring(properties.assignedResourceId))
-            | project dueDate, owner, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek, governanceStatus, assessmentId
+                    assessmentId = tolower(tostring(properties.assignedResourceId)),
+                    assignmentKey = tostring(properties.assignmentKey)
+            | project dueDate, isGracePeriod, owner, disableOwnerEmailNotification, disableManagerEmailNotification, governanceStatus, assessmentId, assignmentKey, emailNotificationDayOfWeek
         ) on assessmentId
         | extend completionStatus = case(
             governanceStatus == 'Overdue', 'Overdue',
@@ -98,8 +100,9 @@ function Get-CsAzGovAssignment {
             'Completed'
         )
         | where completionStatus in~ ($completionStatus)
-        | project displayName, resourceId, assessmentKey, resourceType, resourceName, dueDate, owner, completionStatus
-        | order by completionStatus, displayName
+        | extend csEnvironment = '$CsEnvironment'
+        | project csEnvironment, resourceId,assessmentName, assignmentKey,displayName, completionStatus, resourceType, resourceName, owner, dueDate, isGracePeriod, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek
+        | order by completionStatus, displayName, owner
 "@
 
     $payLoad = @"
@@ -108,35 +111,11 @@ function Get-CsAzGovAssignment {
     }
 "@
 
-    Write-OutputPadded "Query Payload:" -Type 'debug' -IndentLevel 1 -BlankLineBefore
-    Write-OutputPadded "$payLoad" -Type 'data' -IndentLevel 1 -BlankLineBefore
+    Write-OutputPadded "Query Payload:" -Type 'debug' -IdentLevel 1 -BlankLineBefore
+    Write-OutputPadded "$payLoad" -Type 'data' -IdentLevel 1 -BlankLineBefore
 
     $uri = "$($azapicallconf.azAPIEndpointUrls.ARM)/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01"
-    $queryResult = AzAPICall -AzAPICallConfiguration $azapiCallConf -uri $uri -body $payLoad -method 'POST' -listenOn Content
-
-    $GovAssignments = [System.Collections.ArrayList]::new()
-
-    foreach ($assignment in $queryResult) {
-
-        $GovAssignmentObj = [GovAssignment]::new()
-        $GovAssignmentObj.CsEnvironment = $CsEnvironment
-        $GovAssignmentObj.SourceType = 'Az'
-        $GovAssignmentObj.AssessmentName = $assignment.assessmentKey
-        $GovAssignmentObj.AssessmentDisplayName = $assignment.displayName
-        $GovAssignmentObj.AssignedResourceId = $assignment.resourceId
-        $GovAssignmentObj.ContainerId = $assignment.resourceId.split("/")[2]
-        $GovAssignmentObj.AssignmentKey = $assignment.assessmentKey
-        $GovAssignmentObj.RemediationDueDate = $assignment.dueDate
-        $GovAssignmentObj.IsGracePeriod = $assignment.isGracePeriod
-        $GovAssignmentObj.Owner = $assignment.owner
-        $GovAssignmentObj.OwnerEmailNotification = $assignment.disableOwnerEmailNotification
-        $GovAssignmentObj.ManagerEmailNotification = $assignment.disableManageremailnotification
-        $GovAssignmentObj.NotificationDayOfWeek = $assignment.notificationDayOfWeek
-
-        # Add the assignment to the list
-        $GovAssignments.add($GovAssignmentObj)
-        $assignment | Add-Member -MemberType NoteProperty -Name "Environment" -Value $CsEnvironment
-    }
+    $GovAssignments = AzAPICall -AzAPICallConfiguration $azapiCallConf -uri $uri -body $payLoad -method 'POST' -listenOn Content
 
     return $GovAssignments
 }
