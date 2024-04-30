@@ -87,7 +87,6 @@ function Write-OutputPadded {
 
     $indentation = $IdentLevel * 4
     $effectiveWidth = $Width - $indentation
-    $lines = $Text -split '\r?\n'
     $wrappedLines = @()
 
     if ($Text.Length -le $effectiveWidth) {
