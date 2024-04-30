@@ -1,12 +1,52 @@
 function Update-CsAzGovAssignment {
-    [CmdletBinding()]
+    <#
+.SYNOPSIS
+Updates an Azure Governance Assignment.
+
+.DESCRIPTION
+The Update-CsAzGovAssignment function updates an Azure Governance Assignment with the provided parameters.
+
+.PARAMETER azAPICallConf
+A hashtable containing the configuration for the Azure API call.
+
+.PARAMETER resourceId
+The unique identifier of the resource.
+
+.PARAMETER AssessmentName
+The name of the assessment.
+
+.PARAMETER assignmentKey
+The key of the assignment.
+
+.PARAMETER RemediationDueDate
+The due date for remediation. This is optional.
+
+.PARAMETER IsGracePeriod
+Indicates whether there is a grace period. This is optional.
+
+.PARAMETER OwnerEmailAddress
+The email address of the owner. This is optional.
+
+.PARAMETER OwnerEmailNotification
+Indicates whether the owner will receive email notifications. This is optional.
+
+.PARAMETER ManagerEmailNotification
+Indicates whether the manager will receive email notifications. This is optional.
+
+.PARAMETER NotificationDayOfWeek
+The day of the week when notifications will be sent. This is optional and must be one of 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'.
+
+.EXAMPLE
+$azAPICallConf = @{...}
+Update-CsAzGovAssignment -azAPICallConf $azAPICallConf -resourceId "resourceId" -AssessmentName "AssessmentName" -assignmentKey "assignmentKey"
+
+This example updates an Azure Governance Assignment with the provided parameters.
+#>
+    [CmdletBinding(SupportsShouldProcess)]
     param (
 
         [Parameter(Position = 0, Mandatory = $true)]
         [System.Collections.Hashtable]$azAPICallConf,
-
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$CsEnvironment,
 
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [string]$resourceId,
@@ -104,15 +144,16 @@ function Update-CsAzGovAssignment {
         Write-OutputPadded "Updating Azure Governance Assignment" -Type 'debug' -IdentLevel 1
 
 
-        # if no error, then displqy success message
         try {
-            AzAPICall -AzAPICallConfiguration $azAPICallConf -uri $uri -method 'PUT' -body $jsonBody -listenOn Content
+            # Check if the operation should proceed using ShouldProcess
+            if ($PSCmdlet.ShouldProcess("$uri", "Update Azure Governance Assignment")) {
+                AzAPICall -AzAPICallConfiguration $azAPICallConf -uri $uri -method 'PUT' -body $jsonBody -listenOn Content
+                Write-OutputPadded "Azure Governance Assignment Updated Successfully" -Type 'success' -IdentLevel 1
+            }
         }
+        # Catch block to handle any exceptions that occur during the update operation
         catch {
             Write-OutputPadded "Failed to update Azure Governance Assignment: $_" -Type 'error' -IdentLevel 1
-        }
-        finally {
-             Write-OutputPadded "Azure Governance Assignment Updated Successfully" -Type 'success' -IdentLevel 1
         }
     }
 }
