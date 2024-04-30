@@ -1,11 +1,12 @@
 function Update-CsAzGovAssignment {
     [CmdletBinding()]
     param (
+
+        [Parameter(Position = 0, Mandatory = $true)]
+        [System.Collections.Hashtable]$azAPICallConf,
+
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$CsEnvironment,
-
-        # [Parameter(Mandatory = $true, ParameterSetName = 'Pipeline', ValueFromPipeline = $true)]
-        # [PSCustomObject]$InputObject,
 
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [string]$resourceId,
@@ -17,13 +18,13 @@ function Update-CsAzGovAssignment {
         [string]$assignmentKey,
 
         [Parameter(Mandatory = $false)]
-        [string]$RemediationDueDate,
+        [datetime]$RemediationDueDate,
 
         [Parameter(Mandatory = $false)]
-        [bool]$IsGracePeriod,
+        [object]$IsGracePeriod,
 
         [Parameter(Mandatory = $false)]
-        [string]$Owner,
+        [string]$OwnerEmailAddress,
 
         [Parameter(Mandatory = $false)]
         [bool]$OwnerEmailNotification,
@@ -37,16 +38,7 @@ function Update-CsAzGovAssignment {
 
     )
 
-    # $resourceId = '/subscriptions/9777febd-0778-4939-91ff-2e58200ac9cb/resourcegroups/terraform-core-backend-rg/providers/microsoft.storage/storageaccounts/tfcorebackendsa3056'
-    # $assessmentName = '3b3638042-30f5-4056-980d-3a40fa5de8b3'
 
-    # $assignmentKey = '1902388e-73ce-44d2-9ded-7dc49d251773'
-
-    # $uri = "$($azapicallconf.azAPIEndpointUrls.ARM)$resourceId/providers/microsoft.security/assessments/$assessmentName/governanceAssignments/$assignmentKey/?api-version=2021-06-01"
-
-    # $result = AzAPICall -AzAPICallConfiguration $azapiCallConf -uri $uri -method 'GET' -listenOn Content
-
-    # $result | fl
 
     begin {
         # if the input is not from pipeline, then create a custom object with a single entry
@@ -55,28 +47,72 @@ function Update-CsAzGovAssignment {
 
     process {
 
-
-        # not possibla to do it this way as by default the bollean values are false
-        # if (
-        #     $null -eq $RemediationDueDate -and
-        #     $null -eq $IsGracePeriod -and
-        #     $null -eq $Owner -and
-        #     $null -eq $OwnerEmailNotification -and
-        #     $null -eq $ManagerEmailNotification
-        # ) {
-        #     Write-OutputPadded "At least one property to update must be specified !" -IdentLevel 1 -type 'error'
-        # }
-
         Write-OutputPadded "Processing Azure Governance Assignment" -Type 'information' -IdentLevel 1 -BlankLineBefore
         Write-OutputPadded "Resource Id: $resourceId" -Type 'information' -IdentLevel 1
         Write-OutputPadded "Assessment Name: $AssessmentName" -Type 'Verbose' -IdentLevel 1
         Write-OutputPadded "Assignment Key: $assignmentKey" -Type 'Verbose' -IdentLevel 1
-        # If ($null -ne $RemediationDueDate) { Write-OutputPadded "Remediation Due Date: $RemediationDueDate" -Type 'Verbose' -IdentLevel 1 }
-        # If ($null -ne $IsGracePeriod) { Write-OutputPadded "Is Grace Period: $IsGracePeriod" -Type 'Verbose' -IdentLevel 1 }
-        # If ($null -ne $Owner) { Write-OutputPadded "Owner: $Owner" -Type 'Verbose' -IdentLevel 1 }
-        # If ($null -ne $OwnerEmailNotification) { Write-OutputPadded "Owner Email Notification: $OwnerEmailNotification" -Type 'Verbose' -Inden }
-        # If ($null -ne $ManagerEmailNotification) { Write-OutputPadded "Manager Email Notification: $ManagerEmailNotification" -Type 'Verbose' -I }
-        # If ($null -ne $NotificationDayOfWeek) { Write-OutputPadded "Notification Day Of Week: $NotificationDayOfWeek" -Type 'Verbose' -Indent }
 
+        $uri = "$($azAPICallConf.azAPIEndpointUrls.ARM)$resourceId/providers/microsoft.security/assessments/$AssessmentName/governanceAssignments/$assignmentKey/?api-version=2021-06-01"
+
+        # get the existing assignment
+        $govassessment = AzAPICall -AzAPICallConfiguration $azAPICallConf -uri $uri -method 'GET' -listenOn Content
+
+
+        if ($RemediationDueDate) {
+            # Update the remediationDueDate
+            $RemediationDueDate = $RemediationDueDate.ToString('yyyy-MM-dd')
+            Write-OutputPadded "New remediation Due Date: $RemediationDueDate" -Type 'Verbose' -IdentLevel 1
+            $govassessment.properties.remediationDueDate = $RemediationDueDate
+        }
+
+        if ($IsGracePeriod) {
+            # Update the isGracePeriod
+            Write-OutputPadded "New isGracePeriod: $IsGracePeriod" -Type 'Verbose' -IdentLevel 1
+            $govassessment.properties.isGracePeriod = $IsGracePeriod
+        }
+
+        if ($OwnerEmailAddress) {
+            # Update the owner
+            Write-OutputPadded "New Owner Email Address: $OwnerEmailAddress" -Type 'Verbose' -IdentLevel 1
+            $govassessment.properties.owner = $OwnerEmailAddress
+        }
+
+        if ($OwnerEmailNotification) {
+            # Update the disableOwnerEmailNotification
+            Write-OutputPadded "New Owner Email Notification: $OwnerEmailNotification" -Type 'Verbose' -IdentLevel 1
+            $govassessment.properties.governanceEmailNotification.disableOwnerEmailNotification = $OwnerEmailNotification
+        }
+
+        if ($ManagerEmailNotification) {
+            # Update the disableManagerEmailNotification
+            Write-OutputPadded "New Manager Email Notification: $ManagerEmailNotification" -Type 'Verbose' -IdentLevel 1
+            $govassessment.properties.governanceEmailNotification.disableManagerEmailNotification = $ManagerEmailNotification
+        }
+
+        if ($NotificationDayOfWeek) {
+            # Update the emailNotificationDayOfWeek
+            Write-OutputPadded "New Email Notification Day Of Week: $NotificationDayOfWeek" -Type 'Verbose' -IdentLevel 1
+            $govassessment.properties.governanceEmailNotification.emailNotificationDayOfWeek = $NotificationDayOfWeek
+        }
+
+        # Convert the updated object to JSON
+        $jsonBody = $govassessment | ConvertTo-Json -Depth 10
+        Write-OutputPadded "Updated JSON Body:" -Type 'data' -IdentLevel 1
+        Write-OutputPadded "$jsonBody" -Type 'data' -IdentLevel 1
+
+        # Update the assignment
+        Write-OutputPadded "Updating Azure Governance Assignment" -Type 'debug' -IdentLevel 1
+
+
+        # if no error, then displqy success message
+        try {
+            AzAPICall -AzAPICallConfiguration $azAPICallConf -uri $uri -method 'PUT' -body $jsonBody -listenOn Content
+        }
+        catch {
+            Write-OutputPadded "Failed to update Azure Governance Assignment: $_" -Type 'error' -IdentLevel 1
+        }
+        finally {
+             Write-OutputPadded "Azure Governance Assignment Updated Successfully" -Type 'success' -IdentLevel 1
+        }
     }
 }
