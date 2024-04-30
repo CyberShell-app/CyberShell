@@ -100,7 +100,8 @@ function Get-CsAzGovAssignment {
             'Completed'
         )
         | where completionStatus in~ ($completionStatus)
-        | project resourceId,assessmentName, assignmentKey,displayName, completionStatus, resourceType, resourceName, owner, dueDate, isGracePeriod, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek
+        | extend csEnvironment = '$CsEnvironment'
+        | project csEnvironment, resourceId,assessmentName, assignmentKey,displayName, completionStatus, resourceType, resourceName, owner, dueDate, isGracePeriod, disableOwnerEmailNotification, disableManagerEmailNotification, emailNotificationDayOfWeek
         | order by completionStatus, displayName, owner
 "@
 
