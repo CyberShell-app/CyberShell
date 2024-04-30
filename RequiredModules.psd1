@@ -14,6 +14,8 @@
     ChangelogManagement         = 'latest'
     Sampler                     = 'latest'
     'Sampler.GitHubTasks'       = 'latest'
+    'DscResource.DocGenerator'  = 'latest'
+    PlatyPS                     = 'latest'
 
 
 }
