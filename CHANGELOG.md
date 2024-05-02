@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- dependency to the [`AzApiCall`](https://github.com/JulianHayward/AzAPICall) module
+
 ## [0.6.1] - 2024-04-30
 
 ### Added
