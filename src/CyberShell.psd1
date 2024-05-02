@@ -33,7 +33,7 @@ Copyright = '(c) François Lefebvre. All rights reserved.'
 Description = 'The CyberShell PowerShell module streamlines cloud security management, offering tools for analyzing security data and implementing cybersecurity features efficiently. It helps discovering security configuration in complex environments, consolidates security insights, aids in detecting vulnerabilities, and ensures compliance across multiple cloud platforms. With CyberShell, SOC team can quickly enhance their cloud security posture through an intuitive command-line interface.'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '5.0'
+PowerShellVersion = '7.0'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -51,7 +51,9 @@ PowerShellVersion = '5.0'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @()
+RequiredModules = @(
+    'AzApiCall'
+)
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
