@@ -73,9 +73,10 @@
     }
   ],
   "automerge": true,
+  "platformAutomerge": true,
   "printConfig": false,
   "rebaseWhen": "behind-base-branch",
-  "recreateWhen":"auto",
+  "recreateWhen": "auto",
   "timezone": "Etc/UTC",
   "schedule": [
     "* * * * 0,6"
