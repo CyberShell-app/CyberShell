@@ -75,6 +75,7 @@
   "automerge": true,
   "printConfig": false,
   "rebaseWhen": "behind-base-branch",
+  "recreateWhen":"auto",
   "timezone": "Etc/UTC",
   "schedule": [
     "* * * * 0,6"
