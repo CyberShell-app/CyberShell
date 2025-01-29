@@ -32,11 +32,11 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@dcb17efb49ec7f20efdebce79cc397a3952c63db # v1.2.0
+        uses: gittools/actions/gitversion/setup@b4372b9a14557a67171fe7292bf2f92b657c26a3 # v3.1.11
         with:
           versionSpec: 5.x
       - name: Evaluate Next Version
-        uses: gittools/actions/gitversion/execute@dcb17efb49ec7f20efdebce79cc397a3952c63db # v1.2.0
+        uses: gittools/actions/gitversion/execute@b4372b9a14557a67171fe7292bf2f92b657c26a3 # v3.1.11
         with:
           configFilePath: GitVersion.yml
       - name: Build & Package Module
@@ -173,7 +173,7 @@ jobs:
           nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS7/NUnit*.xml
           check_name: WinPS71 Test Results
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+        uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3 # v5.3.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CyberShell-App/CyberShell
