@@ -59,7 +59,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
@@ -82,7 +82,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
@@ -105,7 +105,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
@@ -137,17 +137,17 @@ jobs:
       #   with:
       #     path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
       - name: Download Test Artifact macOS
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: CodeCoverageMacOS
           path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageMacOS/
       - name: Download Test Artifact Linux
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: CodeCoverageLinux
           path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageLinux/
       - name: Download Test Artifact Windows (PS7)
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: CodeCoverageWinPS7
           path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS7/
@@ -173,7 +173,7 @@ jobs:
           nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS7/NUnit*.xml
           check_name: WinPS71 Test Results
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3 # v5.3.1
+        uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CyberShell-App/CyberShell
@@ -193,7 +193,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download Build Artifact
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4
         with:
           name: ${{ env.buildArtifactName }}
           path: ${{ env.buildFolderName }}
