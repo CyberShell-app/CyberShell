@@ -14,6 +14,21 @@
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": true,
+      "description": "Enable only major and minor updates"
+    },
+    {
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "enabled": false,
+      "description": "Disable patch updates"
+    },
+    {
       "groupName": "Docker",
       "groupSlug": "docker",
       "matchDatasources": [
